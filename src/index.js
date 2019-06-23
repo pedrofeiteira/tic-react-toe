@@ -10,36 +10,39 @@ function Square(props) {
   );
 }
 
+function Move(props) {
+  const msg = 'Go to move #' + props.index + ` (${Math.floor(props.move.moveCoordinates.row)}, ${Math.floor(props.move.moveCoordinates.column)})`;
+  return props.index === props.stepNumber 
+  ? (<b>{msg}</b>) 
+  : msg
+}
+
 class Board extends React.Component {
   renderSquare(i) {
     return (
-          <Square 
+          <Square
+            key={i} 
             value={this.props.squares[i]}
             onClick={() => this.props.onClick(i)} 
           />
     );
   }
 
+  renderBoard() {
+    let rows = [];
+    let currentIndex = 0;
+    for (let i = 0; i < 3; i++) {
+      let rowSquares = [];
+      for (let j = 0; j < 3; j++) {
+        rowSquares.push(this.renderSquare(currentIndex++));
+      }
+      rows.push(<div className="board-row">{rowSquares}</div>)
+    }
+    return rows;
+  }
+
   render() {
-    return (
-      <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
-      </div>
-    );
+    return this.renderBoard();
   }
 }
 
@@ -92,13 +95,13 @@ class Game extends React.Component {
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
 
-    const moves = history.map((step, move) => {
-      const desc = move ?
-        'Go to move #' + move + ` (${Math.floor(step.moveCoordinates.row)}, ${Math.floor(step.moveCoordinates.column)})` :
-        'Go to game start';
+    const moves = history.map((move, moveIndex) => {
+      const desc = moveIndex 
+      ? <Move move={move} index={moveIndex} stepNumber={this.state.stepNumber}/> 
+      : 'Go to game start';
       return (
-        <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+        <li key={moveIndex}>
+          <button onClick={() => this.jumpTo(moveIndex)}>{desc}</button>
         </li>
       )
     });
